@@ -22,7 +22,7 @@ class FakeQuantLinear(nn.Linear):
         super().__init__(in_features, out_features, bias)
         self.num_bits = num_bits
 
-    def fake_quantize(self, weight: torch.Tensor) -> torch.Tensor: #changed for oprimisation, allocates only 2 tensors
+    def fake_quantize(self, weight: torch.Tensor) -> torch.Tensor: 
         
         n_levels = 2 ** (self.num_bits -1) - 1
         clipping_ratio = 0.990

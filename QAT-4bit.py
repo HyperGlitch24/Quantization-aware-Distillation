@@ -44,8 +44,7 @@ class FakeQuantLinear(nn.Linear):
             threshold = threshold.clamp(min=1e-8)
             scale     = threshold.div(n_levels).clamp(min=1e-8)
 
-        # clip outliers before quantizing — this is what your diagnostic
-        # showed reduces mean abs error by 35% vs MinMax at 4-bit
+       
         q = weight.clamp(-threshold, threshold)
         q = q.div(scale)
         q.round_()
@@ -227,7 +226,7 @@ latest_ckpt = find_latest_checkpoint(Ckpt_dir)
 if latest_ckpt is not None:
     print("Starting from a found checkpoint")
 
-    # load the model first, no temp needed
+    
     student = AutoModelForCausalLM.from_pretrained(
         latest_ckpt,
         torch_dtype=torch.bfloat16,
@@ -239,7 +238,7 @@ if latest_ckpt is not None:
     student = student.to(Device)
     student.train()
 
-    # NOW build optimizer from the actual student
+    
     optimizer = AdamW(student.parameters(), lr=LR, weight_decay=0.01)
     scheduler = get_scheduler(
         "cosine",
@@ -248,7 +247,7 @@ if latest_ckpt is not None:
         num_training_steps=Max_steps,
     )
 
-    # restore states onto the correctly-bound optimizer
+    
     opt_state = torch.load(
         os.path.join(latest_ckpt, "optimizer.pt"),
         map_location=Device,

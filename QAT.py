@@ -33,7 +33,7 @@ class FakeQuantLinear(nn.Linear):
         super().__init__(in_features, out_features, bias)
         self.num_bits = num_bits
 
-    def fake_quantize(self, weight: torch.Tensor) -> torch.Tensor: #changed for oprimisation, allocates only 2 tensors
+    def fake_quantize(self, weight: torch.Tensor) -> torch.Tensor: 
         
         n_levels = 2 ** (self.num_bits -1) - 1
         clipping_ratio = 0.990
@@ -227,7 +227,7 @@ latest_ckpt = find_latest_checkpoint(Ckpt_dir)
 if latest_ckpt is not None:
     print("Starting from a found checkpoint")
 
-    # load the model first, no temp needed
+    
     student = AutoModelForCausalLM.from_pretrained(
         latest_ckpt,
         torch_dtype=torch.bfloat16,
@@ -239,7 +239,7 @@ if latest_ckpt is not None:
     student = student.to(Device)
     student.train()
 
-    # NOW build optimizer from the actual student
+    
     optimizer = AdamW(student.parameters(), lr=LR, weight_decay=0.01)
     scheduler = get_scheduler(
         "cosine",
@@ -248,7 +248,7 @@ if latest_ckpt is not None:
         num_training_steps=Max_steps,
     )
 
-    # restore states onto the correctly-bound optimizer
+    
     opt_state = torch.load(
         os.path.join(latest_ckpt, "optimizer.pt"),
         map_location=Device,
